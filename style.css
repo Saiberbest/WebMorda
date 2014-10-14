@@ -1,0 +1,80 @@
+form label {
+  display: inline-block;
+  width: 225px;
+  font-weight: bold;
+}
+html,body{
+	height:100%;
+	margin:0;
+	padding:0;
+}
+h1,h2,h3,h4,h5,h6 {
+	clear: both;
+	font-family: "Helvetica Neue","Helvetica",Helvetica,Arial,sans-serif;
+	font-weight: bold;
+	line-height: 1.1;
+	margin-bottom:	14px;
+	margin-top: 14px;
+}
+h3{
+	font-size:16px;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+td{
+	vertical-align:top;
+	padding:0;
+}
+td.footer {
+	padding-top: 30px;
+}
+.h100{
+	height:100%;
+}
+div.p4px{
+	clear:both;
+	margin-top:4px;
+}
+textarea{
+	max-width:60%;
+	height:50px;
+	min-width:60%;
+}
+div.footer {
+	background-color: rgba(63, 69, 82, 1);
+	height: 28px;
+	color: #fff;
+	text-align: center;
+}
+div.lcol{
+	width:150px;
+	background-color:rgba(63, 69, 82, 1);
+	margin:0;
+	padding:0;
+}
+div.content{
+	margin:10px;
+}
+div.videoform{
+	max-width:100%;
+	overflow:hidden;
+	min-width:60%;
+	line-height:30px;
+}
+.videoform label{
+	width:180px;
+	height:30px;
+	text-align:right;
+}
+.videoform input{
+	width:200px;
+	height:30px;
+	margin-left:10px;
+}
+.videoform select{
+	width:200px;
+	height:30px;
+	margin-left:10px;
+}
