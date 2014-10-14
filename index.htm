@@ -1,0 +1,293 @@
+
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width" />
+		<link rel="stylesheet" type="text/css" href="style.css" />
+		<title>EVS LTD. - VEC-255-IP camera</title>
+		<script>
+			var param = new Array();
+			var httpResponse;
+			var paramGetNames = ["title","videocodec","videocodecname","videocodeccombo","videocodeccomboname","videocodecres","videocodecresname","bitrate1","framerate1"]
+			
+			getParamResponse();
+			
+			
+			function getXmlHttp() {
+				var xmlhttp;
+				try {
+					xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
+				} catch (e) {
+					try {
+						xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+					} catch (E) {
+						xmlhttp = false;
+					}
+				}
+				if (!xmlhttp && typeof XMLHttpRequest!='undefined') {
+					xmlhttp = new XMLHttpRequest();
+				}
+				return xmlhttp;
+			}
+			
+			
+			
+			function getParamResponse(){
+				paramNames=paramGetNames;
+				var xmlhttp = getXmlHttp();				
+				xmlhttp.onreadystatechange = function() {
+					if (xmlhttp.readyState == 4) {
+						if(xmlhttp.status == 200) {							
+							try {								
+								document.getElementById("responseText").innerHTML += xmlhttp.responseText; 								
+							}catch(e){
+							}
+							httpResponse=xmlhttp.responseText;
+							getParams();
+						}else{
+							try {
+								document.getElementById("responseText").innerHTML += "Error 404: cannot get response from camera!\r\n"; 
+							}catch(e){
+							} 
+							httpResponse="";
+						}
+					}else{httpResponse="";}
+				};				
+				var url='vb.htm?';
+				for(var i=0; i < paramNames.length; i++){
+					url+="paratest="+paramNames[i];
+					if (i<(paramNames.length-1)){url+="&"}
+				}
+				xmlhttp.open('GET', url, true);
+				xmlhttp.send();
+			}
+			
+			
+			
+			function getParams(){
+
+				var tmp = new Array();      // два вспомагательных
+				var tmp2 = new Array();     // массива
+				
+				var get = httpResponse;  
+				if(get != '') {
+					tmp = (get.substr(3)).split('OK ');   
+					for(var i=0; i < tmp.length; i++) {
+						tmp2 = tmp[i].split('=');       
+						param[tmp2[0]] = tmp2[1];       
+					}					
+					parseCodecSelectNames();
+					displayParamSet(param);
+				}else{
+					try {
+						document.getElementById("responseText").innerHTML += "Error: empty response from camera!\r\n"; 
+					}catch(e){
+					} 
+				}
+			}
+			
+			function parseCodecSelectNames(){
+				try {
+				
+					//Парсим videocodecname
+					var tmp = new Array();      // два вспомогательных
+					var tmp2 = new Array();     // массива
+					var videocodecname = param["videocodecresname"];
+					if(videocodecname != '') {
+						tmp = (videocodecname).split(';');   
+						for(var i=0; i < tmp.length; i++) {							      
+							param["videocodecnameParsed"][i] = tmp[i];       
+						}					
+					}
+					//Парсим videocodeccomboname
+					tmp = new Array();      // два вспомогательных
+					tmp2 = new Array();     // массива
+					var videocodeccomboname = param["videocodeccomboname"];
+					if(videocodeccomboname != '') {
+						tmp = (videocodeccomboname).split('@');   
+						for(var i=0; i < tmp.length; i++) {	
+							tmp2 = tmp[i].split(';'); 
+							for(var j=0; j < tmp.length; j++) {	
+								param["videocodeccombonameParsed"][i][j] = tmp2[j]; 
+							}
+						}					
+					}
+					//Парсим videocodecresname
+					tmp = new Array();      // два вспомогательных
+					tmp2 = new Array();     // массива
+					var videocodecresname = param["videocodecresname"];
+					if(videocodecresname != '') {
+						tmp = (videocodecresname).split('@');   
+						for(var i=0; i < tmp.length; i++) {	
+							tmp2 = tmp[i].split(';'); 
+							for(var j=0; j < tmp.length; j++) {	
+								param["videocodecresnameParsed"][i][j] = tmp2[j]; 
+							}
+						}					
+					}
+					
+				}catch(e){
+					var obj = document.getElementById("displayErrorLog"); 							
+					obj.innerHTML += "Cannot parse videocodec names.\r\n";
+				}
+				
+			}
+			
+			
+			function createCodecSelect(selectName){
+				var videocodecSelect;
+				var videocodeccomboSelect;
+				var videocodecresSelect;		
+				//Получаем имена для селектов
+				var videocodecname=param["videocodecnameParsed"];
+				var videocodeccombo=param["videocodeccomboParsed"][param["videocodec"]];	
+				var videocodecresNum;
+				//Ищем порядковый номер videocodecres
+				if (param["videocodec"]==0){
+					videocodecresNum=0+param["videocodeccombo"];
+				}else if (param["videocodec"]==1){
+					videocodecresNum=3+param["videocodeccombo"];
+				}else if (param["videocodec"]==2){
+					videocodecresNum=8+param["videocodeccombo"];
+				}				
+				var videocodecres=param["videocodecresParsed"][videocodecresNum];	
+				try {
+					if (selectName=="videocodec"){
+						//Выбираем селекты из DOM
+						videocodecSelect = document.getElementById("videocodec");		
+						//Очищаем
+						videocodecSelect.options.length = 0;
+						//Создаём новые элементы											
+						for (var i=0; i<videocodecname.length; i++){
+							videocodecSelect.options[i]=new Option(videocodecname[i], i);
+						}						
+					}else if(selectName=="videocodeccombo"){
+						videocodeccomboSelect = document.getElementById("videocodeccombo");
+						videocodeccomboSelect.options.length = 0;
+						for (var i=0; i<videocodeccombo.length; i++){
+							videocodeccomboSelect.options[i]=new Option(videocodeccombo[i], i);
+						}	
+					}else if(selectName=="videocodecres"){
+						videocodecresSelect = document.getElementById("videocodecres"); 
+						videocodecresSelect.options.length = 0;
+						for (var i=0; i<videocodeccombo.length; i++){
+							videocodecresSelect.options[i]=new Option(videocodecres[i], i);
+						}	
+						
+					}								
+				}catch (e) {
+					try {
+						var obj = document.getElementById("displayErrorLog"); 							
+						obj.innerHTML += "Cannot find one of videocodec selects.\r\n";
+					}catch (e) {}
+				}
+			}
+			
+			
+			
+			function displayParamSet(paramSet){
+				for (var key in paramSet) {
+					try {
+						var obj = document.getElementById(key);  
+						idTagName=obj.tagName.toLowerCase();						
+						if (idTagName=="input"){
+							obj.value = paramSet[key];							
+						}else if (idTagName=="select"){
+							//Если селект относится к выбору кодека, то запускаем функцию обновления селектов кодеков
+							if (key=="videocodec"||key=="videocodeccombo"||key=="videocodecres"){
+								createCodecSelect(key);
+							}
+							obj.value = paramSet[key];
+							obj.options.selectedIndex=paramSet[key];
+						}else{document.getElementById("idTagName").innerHTML+=key+"="+idTagName+"\r\n";}
+					}catch (e) {
+						try {
+							var obj = document.getElementById("displayErrorLog"); 							
+							obj.innerHTML += key+" = "+paramSet[key]+"\r\n";
+						}catch (e) {
+						}
+					}
+				}
+			}			
+		</script>
+	</head>
+
+	<body onload="">
+		<table width="100%" class="h100" cellpadding="0" cellspacing="0">
+			<tbody>
+				<tr>
+					<td class="h100">	
+						<table class="h100">
+							<tbody>
+								<tr>
+									<td class="h100">
+										<div class="lcol h100">
+											<a href="/" class="logo"><img alt="" src="/logo.png"></a>
+										</div>
+									</td>
+									<td width="100%">
+										<div class="content">
+											<div class="videoform">
+												<form>
+													<label>bitrate1</label>
+													<input id="bitrate1" value="-1"></input>
+													<div class="p4px"></div>
+													<label>videocodec</label>
+													<select id="videocodec">
+														<option value="0">Single</option>
+														<option value="1">Dual</option>
+														<option value="2" selected="selected">Tri-Stream</option>
+													</select>													
+													<div class="p4px"></div>
+													<label>videocodeccombo</label>
+													<select id="videocodeccombo">
+														<option value="0">H.264</option>
+														<option value="1">MPEG4</option>
+														<option value="2">MegaPixel</option>
+													</select>													
+													<div class="p4px"></div>
+													<label>videocodecres</label>
+													<select id="videocodecres">			
+														<option value="0">H264:720</option>
+														<option value="1">H264:D1</option>
+														<option value="2">H264:SXVGA</option>
+														<option value="1">H264:1080</option>
+														<option value="2">H264:720MAX60</option>
+													</select>
+													<div class="p4px"></div>
+													<div class="button" onclick="getParamResponse();" style="background-color:#ccc;width:200px;height:40px;text-align:center;line-height:40px;">Reload</div>
+												</form>
+											</div>
+											<h3>idTagName:</h3>
+											<textarea type="text" id="idTagName"></textarea>
+											<h3>displayErrorLog:</h3>
+											<textarea type="text" id="displayErrorLog"></textarea>
+											<h3>Response:</h3>
+											<textarea type="text" id="responseText"></textarea>				
+										</div>		
+									</td>
+								</tr>
+							</tbody>
+						</table>					
+					</td>
+				</tr>
+				
+				<!--Футер-->  	
+				<tr>
+					<td class="footer">
+						<div class="row footer">
+							<!--Начало Футер-->
+							Copyright © 2014 by EVS LTD. All Rights Reserved.
+							<!--Конец футер-->
+						</div>
+					</td>
+				</tr>
+				
+			</tbody>
+		</table>
+	</body>
+
+</html>
+
