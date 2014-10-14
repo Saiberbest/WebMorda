@@ -95,10 +95,13 @@
 					var tmp = new Array();      // два вспомогательных
 					var tmp2 = new Array();     // массива
 					var videocodecname = param["videocodecresname"];
+					var obj = document.getElementById("displayErrorLog"); 							
+					
 					if(videocodecname != '') {
 						tmp = (videocodecname).split(';');   
 						for(var i=0; i < tmp.length; i++) {							      
-							param["videocodecnameParsed"][i] = tmp[i];       
+							param["videocodecnameParsed"][i] = tmp[i]; 
+							obj.innerHTML += param["videocodecnameParsed"][i]+"\r\n";							
 						}					
 					}
 					//Парсим videocodeccomboname
