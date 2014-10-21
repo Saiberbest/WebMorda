@@ -1,12 +1,18 @@
+
 form label {
   display: inline-block;
   width: 225px;
   font-weight: bold;
+	font-size:14px;
+	overflow:hidden;
 }
 html,body{
 	height:100%;
 	margin:0;
 	padding:0;
+}
+html,body,form,label,input,table,tr,td,div,textarea{
+	box-sizing: border-box;
 }
 h1,h2,h3,h4,h5,h6 {
 	clear: both;
@@ -33,14 +39,17 @@ td.footer {
 .h100{
 	height:100%;
 }
+form{
+	overflow:hidden;
+}
 div.p4px{
 	clear:both;
 	margin-top:4px;
 }
 textarea{
-	max-width:60%;
-	height:50px;
-	min-width:60%;
+	max-width:100%;
+	height:100px;
+	min-width:100%;
 }
 div.footer {
 	background-color: rgba(63, 69, 82, 1);
@@ -56,25 +65,59 @@ div.lcol{
 }
 div.content{
 	margin:10px;
+	max-width:640px;
 }
 div.videoform{
 	max-width:100%;
 	overflow:hidden;
-	min-width:60%;
+	min-width:100%;
 	line-height:30px;
 }
 .videoform label{
-	width:180px;
+	float:left;
+	width:30%;
 	height:30px;
 	text-align:right;
+	padding-right:10px;
 }
 .videoform input{
-	width:200px;
+	float:right;
+	width:70%;
 	height:30px;
-	margin-left:10px;
 }
 .videoform select{
-	width:200px;
+	float:right;
+	width:70%;
 	height:30px;
-	margin-left:10px;
+}
+
+div.btn{
+	background-color: rgba(63, 69, 82, 1);
+	border: none;
+	transition-property: background-color;
+	transition-duration: 0.15s;
+	padding: 0;
+	width: 100%;
+	color: white;
+	height: 36px;
+	line-height:36px;
+	font-size: 16px;
+	text-align: center;
+}
+div.btn:hover{
+	background-color: rgba(63, 69, 82, 0.8);
+}
+div.l_btn {
+	float: left;
+	width: 50%;
+	padding-right: 2px;
+}
+div.r_btn {
+	float: right;
+	width: 50%;
+	padding-left: 2px;
+}
+div.btns{
+	width:100%;
+	margin-top:4px;
 }
