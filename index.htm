@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 
 <html>
@@ -7,253 +6,7 @@
 		<meta name="viewport" content="width=device-width" />
 		<link rel="stylesheet" type="text/css" href="style.css" />
 		<title>EVS LTD. - VEC-255-IP camera</title>
-		<script>			
-			var param = new Array(); //Переменная, в которой хранятся текущие параметры камеры
-			var tempParam = new Array(); //Переменная, в которой хранятся параметры, введённые пользователем на странице
-			var httpResponse;
-			var paramGetNames = ["title","videocodec","videocodecname","videocodeccombo","videocodeccomboname","videocodecres","videocodecresname","bitrate1","framerate1"]
-			
-			getParamResponse();
-			
-			
-			function getXmlHttp() {
-				var xmlhttp;
-				try {
-					xmlhttp = new ActiveXObject("Msxml2.XMLHTTP");
-				} catch (e) {
-					try {
-						xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
-					} catch (E) {
-						xmlhttp = false;
-					}
-				}
-				if (!xmlhttp && typeof XMLHttpRequest!='undefined') {
-					xmlhttp = new XMLHttpRequest();
-				}
-				return xmlhttp;
-			}
-			
-			
-			
-			function getParamResponse(){
-				paramNames=paramGetNames;
-				var xmlhttp = getXmlHttp();				
-				xmlhttp.onreadystatechange = function() {
-					if (xmlhttp.readyState == 4) {
-						if(xmlhttp.status == 200) {							
-							try {								
-								document.getElementById("responseText").innerHTML += xmlhttp.responseText; 								
-							}catch(e){
-							}
-							httpResponse=xmlhttp.responseText;
-							loadPageScript();							
-						}else{
-							try {
-								document.getElementById("responseText").innerHTML += "Error 404: cannot get response from camera!\r\n"; 
-							}catch(e){
-							} 
-							httpResponse="";
-						}
-					}else{httpResponse="";}
-				};				
-				var url='vb.htm?';
-				for(var i=0; i < paramNames.length; i++){
-					url+="paratest="+paramNames[i];
-					if (i<(paramNames.length-1)){url+="&"}
-				}
-				xmlhttp.open('GET', url, true);
-				xmlhttp.send();
-			}	
-			
-			
-			function loadPageScript(){
-				//После получения ответа от камеры, запускаем этот скрипт
-				
-				//Парсим параметры и сохраняем их в глобальную переменную param[]
-				getParams();
-				
-				//Парсим имена для селектов видеокодеков
-				parseCodecSelectNames();
-				
-				//Создаём копию параметров для хранения введеных пользователем значений
-				tempParam=param;
-				
-				//Создаём селекты в соответствии с текущими значениями
-				createCodecSelect(param);
-				
-				//Отображаем полученные параметры и селекты
-				displayParamSet(param);				
-				
-			}
-			
-			
-			
-			//Функция, которая разбивает строку ответа от камеры на отдельные параметры и записывает их в ассоциативный массив param[key]=value
-			function getParams(){ 
-
-				var tmp = new Array();      // два вспомагательных
-				var tmp2 = new Array();     // массива
-				
-				var get = httpResponse;  
-				if(get != '') {
-					tmp = (get.substr(3)).split('OK ');   
-					for(var i=0; i < tmp.length; i++) {
-						tmp2 = tmp[i].split('=');       
-						param[tmp2[0]] = tmp2[1];       
-					}										
-				}else{
-					try {
-						document.getElementById("responseText").innerHTML += "Error: empty response from camera!\r\n"; 
-					}catch(e){
-					} 
-				}
-			}
-			
-			
-			//Функция, которая парсит имена кодеков 
-			function parseCodecSelectNames(){
-				try {	
-				
-					var tmp = new Array();      // два вспомогательных
-					var tmp2 = new Array();     // массива
-					//var obj = document.getElementById("displayErrorLog"); 
-											
-					//obj.innerHTML += "videocodecnameParsed:\r\n";
-					
-					//Парсим videocodecname
-					var videocodecname = param["videocodecname"];					
-					if(videocodecname != '') {
-						param["videocodecnameParsed"]=new Array();
-						tmp = (videocodecname).split(';');   
-						for(var i=0; i < tmp.length; i++) {							      
-							param["videocodecnameParsed"][i] = tmp[i]; 
-							//obj.innerHTML += param["videocodecnameParsed"][i]+"\r\n";							
-						}					
-					}
-					
-					//Парсим videocodeccomboname
-					tmp = new Array();      // два вспомогательных
-					tmp2 = new Array();     // массива
-					
-					//obj.innerHTML += "videocodeccombonameParsed:\r\n";
-					var videocodeccomboname = param["videocodeccomboname"];					
-					
-					if(videocodeccomboname != '') {
-						param["videocodeccombonameParsed"]=new Array();
-						tmp = (videocodeccomboname).split('@');   
-						for(var i=0; i < tmp.length; i++) {	
-							tmp2 = tmp[i].split(';'); 
-							param["videocodeccombonameParsed"][i]=new Array();
-							for(var j=0; j < tmp2.length; j++) {	
-								param["videocodeccombonameParsed"][i][j] = tmp2[j]; 
-								//obj.innerHTML += param["videocodeccombonameParsed"][i][j]+"\r\n";
-							}
-						}					
-					}
-					
-					//Парсим videocodecresname
-					tmp = new Array();      // два вспомогательных
-					tmp2 = new Array();     // массива
-					
-					//obj.innerHTML += "videocodecresnameParsed:\r\n";
-					var videocodecresname = param["videocodecresname"];
-					
-					if(videocodecresname != '') {
-						param["videocodecresnameParsed"]=new Array();
-						tmp = (videocodecresname).split('@');   
-						for(var i=0; i < tmp.length; i++) {	
-							tmp2 = tmp[i].split(';'); 
-							param["videocodecresnameParsed"][i]=new Array();
-							for(var j=0; j < tmp2.length; j++) {	
-								param["videocodecresnameParsed"][i][j] = tmp2[j]; 
-								//obj.innerHTML += param["videocodecresnameParsed"][i][j]+"\r\n";
-							}
-						}			
-						
-					}
-					
-				}catch(e){
-					var obj = document.getElementById("displayErrorLog"); 							
-					obj.innerHTML += "Cannot parse videocodec names.\r\n";
-				}
-				
-			}
-			
-			
-			function createCodecSelect(paramSet){
-				var videocodecSelect;
-				var videocodeccomboSelect;
-				var videocodecresSelect;		
-				//Получаем имена для селектов
-				var videocodecname=paramSet["videocodecnameParsed"];
-				var videocodeccombo=paramSet["videocodeccombonameParsed"][parseInt(paramSet["videocodec"])];	
-				var videocodecresNum;
-				//Ищем порядковый номер videocodecres
-				if (paramSet["videocodec"]==0){
-					videocodecresNum=0 + parseInt(paramSet["videocodeccombo"]);
-				}else if (paramSet["videocodec"]==1){
-					videocodecresNum=3 + parseInt(paramSet["videocodeccombo"]);
-				}else if (paramSet["videocodec"]==2){
-					videocodecresNum=8 + parseInt(paramSet["videocodeccombo"]);
-				}				
-				var videocodecres=paramSet["videocodecresnameParsed"][videocodecresNum];	
-				try {
-					//if (selectName=="videocodec"){
-						//Выбираем селекты из DOM
-						videocodecSelect = document.getElementById("videocodec");		
-						//Очищаем
-						videocodecSelect.options.length = 0;
-						//Создаём новые элементы											
-						for (var i=0; i<videocodecname.length; i++){
-							videocodecSelect.options[i]=new Option(videocodecname[i], i);
-						}						
-					//}else if(selectName=="videocodeccombo"){
-						videocodeccomboSelect = document.getElementById("videocodeccombo");
-						videocodeccomboSelect.options.length = 0;
-						for (var i=0; i<videocodeccombo.length; i++){
-							videocodeccomboSelect.options[i]=new Option(videocodeccombo[i], i);
-						}	
-					//}else if(selectName=="videocodecres"){
-						videocodecresSelect = document.getElementById("videocodecres"); 
-						videocodecresSelect.options.length = 0;
-						for (var i=0; i<videocodecres.length; i++){
-							videocodecresSelect.options[i]=new Option(videocodecres[i], i);
-						}	
-					//}								
-				}catch (e) {
-					try {
-						var obj = document.getElementById("displayErrorLog"); 							
-						obj.innerHTML += "Cannot find one of videocodec selects.\r\n";
-					}catch (e) {}
-				}
-			}
-			
-			
-			
-			function displayParamSet(paramSet){
-				for (var key in paramSet) {
-					try {
-						var obj = document.getElementById(key);  
-						idTagName=obj.tagName.toLowerCase();						
-						if (idTagName=="input"){
-							obj.value = paramSet[key];							
-						}else if (idTagName=="select"){
-							//Если селект относится к выбору кодека, то запускаем функцию обновления селектов кодеков
-							if (key=="videocodec"||key=="videocodeccombo"||key=="videocodecres"){
-							}
-							obj.value = paramSet[key];
-							obj.options.selectedIndex=paramSet[key];
-						}else{document.getElementById("idTagName").innerHTML+=key+"="+idTagName+"\r\n";}
-					}catch (e) {
-						try {
-							var obj = document.getElementById("displayErrorLog"); 							
-							obj.innerHTML += key+" = "+paramSet[key]+"\r\n";
-						}catch (e) {
-						}
-					}
-				}
-			}			
-		</script>
+		<script type="text/javascript" src="videosettings.js"></script>
 	</head>
 
 	<body onload="">
@@ -271,35 +24,48 @@
 									</td>
 									<td width="100%">
 										<div class="content">
+											<h1>Параметры видеопотоков</h1>											
 											<div class="videoform">
-												<form>
-													<label>bitrate1</label>
-													<input id="bitrate1" value="Loading..."></input>
-													<div class="p4px"></div>
+												<h2>Основные параметры:</h2>
+												<form>													
 													<label>videocodec</label>
-													<select id="videocodec">
+													<select id="videocodec" onchange="onCodecSelectChange(0)">
 														<option value="-1">Loading...</option>
 													</select>													
 													<div class="p4px"></div>
 													<label>videocodeccombo</label>
-													<select id="videocodeccombo">
+													<select id="videocodeccombo" onchange="onCodecSelectChange(1)">
 														<option value="-1">Loading...</option>
 													</select>													
 													<div class="p4px"></div>
 													<label>videocodecres</label>
-													<select id="videocodecres">			
+													<select id="videocodecres" onchange="onCodecSelectChange(2)">			
 														<option value="-1">Loading...</option>
-													</select>
+													</select>		
+													<div class="p4px"></div>													
+												</form>													
+												<div class="btns">
+													<div class="l_btn">
+														<div id="btn_cancel" class="btn cancel" onclick="getParamResponse();">Cancel</div>
+													</div>
+													<div class="r_btn">
+														<div id="btn_save" class="btn save" onclick="setParamResponse();">Save</div>
+													</div>
+												</div>
+												<div class="p4px"></div>
+												<div class="stream" id="stream1">
+													<h3>Поток 1</h3>
+													<label>bitrate1</label>
+													<input id="bitrate1" value="Loading..."></input>
 													<div class="p4px"></div>
-													<div class="button" onclick="getParamResponse();" style="background-color:#ccc;width:200px;height:40px;text-align:center;line-height:40px;">Reload</div>
-												</form>
+													<label>framerate1</label>
+													<input id="bitrate1" value="Loading..."></input>
+													<div class="p4px"></div>
+												</div>
+												
 											</div>
-											<h3>idTagName:</h3>
-											<textarea type="text" id="idTagName"></textarea>
-											<h3>displayErrorLog:</h3>
-											<textarea type="text" id="displayErrorLog"></textarea>
-											<h3>Response:</h3>
-											<textarea type="text" id="responseText"></textarea>				
+											<h3>Лог выполнения скрипта:</h3>
+											<textarea type="text" id="scriptLog"></textarea>
 										</div>		
 									</td>
 								</tr>
@@ -324,4 +90,3 @@
 	</body>
 
 </html>
-
